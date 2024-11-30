@@ -6,17 +6,17 @@ const cors = require('cors');
 const app = express();
 const port = 3000;
 const bcrypt = require('bcryptjs');
-
+require('dotenv').config();
 
 app.use(cors()); 
 app.use(express.json());
 
 // Configuración de la base de datos
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '1111', // Cambia si tu contraseña es diferente
-  database: 'PlayTab'
+  host: process.env.EV_HOST,
+  user: process.env.EV_USERNAME,
+  password: process.env.EV_PASS, 
+  database: process.env.EV_NAME
 });
 
 // Conexión a la base de datos MySQL
