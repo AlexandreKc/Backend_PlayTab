@@ -1,0 +1,13 @@
+version: 1
+application:
+  name: nodejs
+  main: server.js
+  nodejs:
+    version: 16  # La versión de Node.js que quieres usar (ajusta según tu necesidad)
+    environment: production  # Configura el entorno de producción
+  build:
+    commands:
+      - npm install  # Instalar las dependencias del proyecto
+  start:
+    commands:
+      - node server.js  # Comando para iniciar el servidor
