@@ -394,11 +394,11 @@ app.put('/cambiaComuna', (req, res) => {
 app.get('/historial', (req, res) => {
   const { Id_User } = req.query;
   const query = `SELECT DISTINCT u.Nom_User, a.Nom_Actividad, a.Desc_actividad, a.Direccion_Actividad, a.Celular_User, a.Fecha_TER_Actividad, s.Nom_SubCategoria, i.url
-                  FROM Participante p
+                  FROM PARTICIPANTE p
                   JOIN ACTIVIDAD a ON p.Id_Actividad = a.Id_Actividad
                   JOIN USUARIO u ON a.Id_Anfitrion_Actividad = u.Id_User
-                  LEFT JOIN subcategoria s ON s.Id_SubCategoria = a.Id_SubCategoria
-                  LEFT JOIN imagen i ON a.Id_SubCategoria = i.Id_SubCategoria
+                  LEFT JOIN SUBCATEGORIA s ON s.Id_SubCategoria = a.Id_SubCategoria
+                  LEFT JOIN IMAGEN i ON a.Id_SubCategoria = i.Id_SubCategoria
                   WHERE p.Id_User = ?;`
   db.query(query, [Id_User], (err, results) => {
     if (err) {
