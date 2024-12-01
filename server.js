@@ -13,10 +13,10 @@ app.use(express.json());
 
 // Configuración de la base de datos
 const db = mysql.createConnection({
-  host: process.env.EV_HOST,
-  user: process.env.EV_USERNAME,
-  password: process.env.EV_PASS, 
-  database: process.env.EV_NAME
+  host: 'localhost',
+  user: 'playtabc_ServRailWayPlayTab2024',
+  password: 'KEvi_3327?', 
+  database: 'playtabc_playtab2024'
 });
 
 // Conexión a la base de datos MySQL
