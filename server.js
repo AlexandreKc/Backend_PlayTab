@@ -114,7 +114,7 @@ app.post('/reset-password', async (req, res) => {
 // HASTA AQUÍ EL TEMA DE RECUPERAR CONTRASEÑA ******************************************
 
 app.get('/api/maps-key', (req, res) => {
-  const apiKey = 'AIzaSyBI63avQmJjhUVvzJNNkejOOfiJml_zUcE'; // Tu API Key
+  const apiKey = process.env.EV_MAPS; // Tu API Key
   res.json({ apiKey });
 });
 
@@ -318,7 +318,7 @@ app.get('/actividades', (req, res) => {
 
 app.get('/jugdoresInscritos', (req, res) => {
   const { Id_Actividad } = req.query;
-  const query = 'SELECT COUNT(Id_Actividad) FROM `PlayTab`.`PARTICIPANTE` WHERE Id_Actividad = ?;';
+  const query = 'SELECT COUNT(Id_Actividad) FROM PARTICIPANTE WHERE Id_Actividad = ?;';
   db.query(query, [Id_Actividad], (err, results) => {
     if (err) {
       console.error('Error:', err);
