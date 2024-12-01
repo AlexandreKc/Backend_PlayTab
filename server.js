@@ -13,10 +13,10 @@ app.use(express.json());
 
 // Configuración de la base de datos
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'playtabc_ServRailWayPlayTab2024',
-  password: 'KEvi_3327?', 
-  database: 'playtabc_playtab2024'
+  host : 'localhost',
+  user: 'playtabc',
+  password: 'KEvi_3327?',
+  database: 'playtabc_playtab2024',
 });
 
 // Conexión a la base de datos MySQL
@@ -24,7 +24,7 @@ db.connect((err) => {
   if (err) {
     console.error('Error connecting to the database:', err);
     return;  }
-  console.log('Connected to MySQL database');
+  console.log('Connected to database');
 });
 
 // Comprobación y adición de la columna 'token' para recuperación de contraseña *******************
