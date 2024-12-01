@@ -4,11 +4,15 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const cors = require('cors'); 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
-app.use(cors()); 
+app.use(cors({
+  origin: ['http://localhost:8100'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+  credentials: true
+}));
 app.use(express.json());
 
 // Configuración de la base de datos
