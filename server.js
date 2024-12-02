@@ -447,5 +447,5 @@ app.delete('/eliminar_usuario_actividad', (req, res) => {
 
 // Iniciar el servidor
 app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+  console.log(`Server running on http://backendplaytab-production.up.railway.app:${port}`);
 });
