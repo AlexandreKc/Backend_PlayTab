@@ -8,14 +8,8 @@ const port = 3000;
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
-app.use(cors({
-  origin: '*', 
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], 
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
-
+app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // Configuración de la base de datos
 const db = mysql.createConnection({
