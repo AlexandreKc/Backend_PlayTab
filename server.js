@@ -15,6 +15,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Configuración de la base de datos
 const db = mysql.createConnection({
