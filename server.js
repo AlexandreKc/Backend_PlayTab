@@ -2,23 +2,21 @@ const express = require('express');
 const mysql = require('mysql2');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
-const bcrypt = require('bcrypt');
 const cors = require('cors'); 
-
-
 const app = express();
 const port = 3000;
+const bcrypt = require('bcryptjs');
+require('dotenv').config();
 
-// Middleware
-app.use(cors()); // Habilita CORS para aceptar solicitudes desde el frontend
-app.use(express.json()); // Para analizar solicitudes con JSON
+app.use(cors()); 
+app.use(express.json());
 
 // Configuración de la base de datos
 const db = mysql.createConnection({
-  host: 'shared10.hostgator.cl',
-  user: 'playtabc_UserApp',
-  password: 'lolm8gYkhzj5', 
-  database: 'playtabc_playtab2024'
+  host: process.env.EV_HOST,
+  user: process.env.EV_USERNAME,
+  password: process.env.EV_PASS, 
+  database: process.env.EV_NAME
 });
 
 // Conexión a la base de datos
