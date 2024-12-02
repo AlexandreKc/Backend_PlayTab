@@ -7,12 +7,20 @@ const app = express();
 const port = 3000;
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
+const allowedOrigins = ['http://localhost:8100', 'http://backendplaytab-production.up.railway.app'];
 app.use(cors({
-  origin: 'http://localhost:8100', // Específico para el frontend
-  methods: ['GET', 'POST', 'OPTIONS'], // Métodos permitidos
-  allowedHeaders: ['Content-Type', 'Authorization'], // Headers permitidos
-  credentials: true, // Permitir cookies o encabezados con credenciales
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS no permitido'));
+    }
+  },
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
 }));
+app.options('*', cors()); // Maneja solicitudes preflight para cualquier ruta
 app.use(express.json());
 
 
