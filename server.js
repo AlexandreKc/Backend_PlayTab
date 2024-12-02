@@ -2,29 +2,23 @@ const express = require('express');
 const mysql = require('mysql2');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const bcrypt = require('bcrypt');
 const cors = require('cors'); 
-const app = express();
-const port = process.env.PORT || 8080;
-const bcrypt = require('bcryptjs');
-require('dotenv').config();
 
-app.use(cors()); 
-app.use(express.json());
+
+const app = express();
+const port = 3000;
+
+// Middleware
+app.use(cors()); // Habilita CORS para aceptar solicitudes desde el frontend
+app.use(express.json()); // Para analizar solicitudes con JSON
 
 // Configuración de la base de datos
 const db = mysql.createConnection({
-  host : 'localhost',
-  user: 'playtabc',
-  password: 'KEvi_3327?',
-  database: 'playtabc_playtab2024',
-});
-
-// Conexión a la base de datos MySQL
-db.connect((err) => {
-  if (err) {
-    console.error('Error connecting to the database:', err);
-    return;  }
-  console.log('Connected to database');
+  host: 'shared10.hostgator.cl',
+  user: 'playtabc_UserApp',
+  password: 'lolm8gYkhzj5', 
+  database: 'playtabc_playtab2024'
 });
 
 // Conexión a la base de datos MySQL
@@ -310,7 +304,7 @@ app.get('/cantidad', (req, res) => {
 app.get('/actividades', (req, res) => {
   const { Id_Comuna } = req.query;
   const query = `SELECT a.Id_Actividad, u.Nom_User, a.Nom_Actividad, a.Fecha_INI_Actividad, a.Fecha_TER_Actividad, a.Desc_Actividad, a.Direccion_Actividad, m.Cantidad_MaxJugador, s.Nom_SubCategoria, C.Nom_Categoria, i.Url 
-                FROM ACTIVIDAD a Inner Join usuario u on a.Id_Anfitrion_Actividad = u.Id_User 
+                FROM ACTIVIDAD a Inner Join USUARIO u on a.Id_Anfitrion_Actividad = u.Id_User 
                 INNER JOIN MAXJUGADOR m ON a.Id_Maxjugador = m.Id_Maxjugador 
                 INNER JOIN SUBCATEGORIA s ON s.Id_SubCategoria = a.Id_SubCategoria 
                 INNER JOIN CATEGORIA C ON s.Id_Categoria = C.Id_Categoria 
