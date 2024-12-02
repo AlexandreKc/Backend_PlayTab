@@ -126,6 +126,11 @@ app.post('/reset-password', async (req, res) => {
 });
 // HASTA AQUÍ EL TEMA DE RECUPERAR CONTRASEÑA ******************************************
 
+app.get('/api/maps-key', (req, res) => {
+  const apiKey = 'AIzaSyBI63avQmJjhUVvzJNNkejOOfiJml_zUcE'; // Tu API Key
+  res.json({ apiKey });
+});
+
 // 1. Aquí se obtendrá las Regiones y Comunas disponibles para poder registrar al usuario.
 app.get('/regiones', (req, res) => {
   const query = 'SELECT * FROM REGION';
@@ -308,7 +313,13 @@ app.get('/cantidad', (req, res) => {
 // 5. Este es para obtener las actividades
 app.get('/actividades', (req, res) => {
   const { Id_Comuna } = req.query;
-  const query = 'SELECT a.Id_Actividad, u.Nom_User, a.Nom_Actividad, a.Fecha_INI_Actividad, a.Fecha_TER_Actividad, a.Desc_Actividad, a.Direccion_Actividad, m.Cantidad_MaxJugador, s.Nom_SubCategoria, C.Nom_Categoria, i.Url FROM ACTIVIDAD a Inner Join usuario u on a.Id_Anfitrion_Actividad = u.Id_User INNER JOIN maxjugador m ON a.Id_Maxjugador = m.Id_Maxjugador INNER JOIN subcategoria s ON s.Id_SubCategoria = a.Id_SubCategoria INNER JOIN CATEGORIA C ON s.Id_Categoria = C.Id_Categoria LEFT JOIN imagen i ON s.Id_SubCategoria = i.Id_SubCategoria WHERE a.Id_Comuna = ? AND Fecha_TER_Actividad>=now();';
+  const query = `SELECT a.Id_Actividad, u.Nom_User, a.Nom_Actividad, a.Fecha_INI_Actividad, a.Fecha_TER_Actividad, a.Desc_Actividad, a.Direccion_Actividad, m.Cantidad_MaxJugador, s.Nom_SubCategoria, C.Nom_Categoria, i.Url 
+                FROM ACTIVIDAD a Inner Join USUARIO u on a.Id_Anfitrion_Actividad = u.Id_User 
+                INNER JOIN MAXJUGADOR m ON a.Id_Maxjugador = m.Id_Maxjugador 
+                INNER JOIN SUBCATEGORIA s ON s.Id_SubCategoria = a.Id_SubCategoria 
+                INNER JOIN CATEGORIA C ON s.Id_Categoria = C.Id_Categoria 
+                LEFT JOIN IMAGEN i ON s.Id_SubCategoria = i.Id_SubCategoria 
+                WHERE a.Id_Comuna = ? AND Fecha_INI_Actividad<=now() and Fecha_TER_Actividad>=now();`;
   db.query(query, [Id_Comuna], (err, results) => {
     if (err) {
       console.error('Error al obtener actividades:', err);
@@ -320,7 +331,7 @@ app.get('/actividades', (req, res) => {
 
 app.get('/jugdoresInscritos', (req, res) => {
   const { Id_Actividad } = req.query;
-  const query = 'SELECT COUNT(Id_Actividad) FROM `PlayTab`.`PARTICIPANTE` WHERE Id_Actividad = ?;';
+  const query = 'SELECT COUNT(Id_Actividad) FROM PARTICIPANTE WHERE Id_Actividad = ?;';
   db.query(query, [Id_Actividad], (err, results) => {
     if (err) {
       console.error('Error:', err);
@@ -332,18 +343,18 @@ app.get('/jugdoresInscritos', (req, res) => {
 
 // insertar participante en la Actividad
 app.post('/participante', (req, res) => {
-  const { Id_Actividad, Id_Asistencia, Id_User } = req.body;
+  const { Id_Actividad, Id_Asistencia, Id_User, Tipo_Participante } = req.body;
 
   if (!Id_Actividad || !Id_User) {
     return res.status(400).json({ error: 'Faltan datos requeridos' });
   }
 
   const query = `
-    INSERT INTO PARTICIPANTE (Id_Actividad, Id_Asistencia, Id_User) 
-    VALUES (?, ?, ?)
+    INSERT INTO PARTICIPANTE (Id_Actividad, Id_Asistencia, Id_User, Tipo_Participante) 
+    VALUES (?, ?, ?, ?)
   `;
 
-  db.query(query, [Id_Actividad, Id_Asistencia || 800, Id_User], (err, result) => {
+  db.query(query, [Id_Actividad, Id_Asistencia || 800, Id_User, Tipo_Participante], (err, result) => {
     if (err) {
       console.error('Error al insertar participante:', err);
       return res.status(500).json({ error: 'Error al insertar participante' });
@@ -395,12 +406,12 @@ app.put('/cambiaComuna', (req, res) => {
 //Ver el historial de actividades
 app.get('/historial', (req, res) => {
   const { Id_User } = req.query;
-  const query = `SELECT DISTINCT a.Nom_Actividad, u.Nom_User, a.Fecha_INI_Actividad, a.Fecha_TER_Actividad, s.Nom_SubCategoria, i.url
-                  FROM Participante p
+  const query = `SELECT DISTINCT u.Nom_User, a.Nom_Actividad, a.Desc_actividad, a.Direccion_Actividad, a.Celular_User, a.Fecha_TER_Actividad, s.Nom_SubCategoria, i.url
+                  FROM PARTICIPANTE p
                   JOIN ACTIVIDAD a ON p.Id_Actividad = a.Id_Actividad
                   JOIN USUARIO u ON a.Id_Anfitrion_Actividad = u.Id_User
-                  LEFT JOIN subcategoria s ON s.Id_SubCategoria = a.Id_SubCategoria
-                  LEFT JOIN imagen i ON a.Id_SubCategoria = i.Id_SubCategoria
+                  LEFT JOIN SUBCATEGORIA s ON s.Id_SubCategoria = a.Id_SubCategoria
+                  LEFT JOIN IMAGEN i ON a.Id_SubCategoria = i.Id_SubCategoria
                   WHERE p.Id_User = ?;`
   db.query(query, [Id_User], (err, results) => {
     if (err) {
@@ -414,15 +425,23 @@ app.get('/historial', (req, res) => {
 // Obtener actividades y datos especificos de la actividad de los usuarios inscritos
 app.get('/actividad_activa', (req, res) => {
   const { Id_User } = req.query;
-  const query = 'SELECT a.Id_Actividad, a.Nom_Actividad,i.Url,a.Fecha_TER_actividad, s.Nom_SubCategoria from participante p inner join Actividad a on p.Id_actividad=a.Id_actividad  inner join imagen i on a.Id_SubCategoria=i.Id_SubCategoria inner join subcategoria s on a.Id_subcategoria=s.Id_subcategoria where Id_user=?';
+  const query = `SELECT DISTINCT a.Nom_Actividad, a.Id_Actividad, u.Nom_User, a.Desc_Actividad, a.Direccion_Actividad, m.Cantidad_MaxJugador, a.Fecha_TER_Actividad, p.Tipo_Participante, s.Nom_SubCategoria, i.Url
+                  FROM PARTICIPANTE p
+                  JOIN ACTIVIDAD a ON p.Id_Actividad = a.Id_Actividad
+                  INNER JOIN MAXJUGADOR m ON a.Id_Maxjugador = m.Id_Maxjugador
+                  JOIN USUARIO u ON a.Id_Anfitrion_Actividad = u.Id_User
+                  LEFT JOIN SUBCATEGORIA s ON s.Id_SubCategoria = a.Id_SubCategoria
+                  LEFT JOIN IMAGEN i ON a.Id_SubCategoria = i.Id_SubCategoria
+                  WHERE p.Id_User = ? AND  p.Tipo_Participante=200 and Fecha_INI_Actividad<=now() and Fecha_TER_Actividad>=now();`;
   db.query(query, [Id_User], (err, results) => {
     if (err) {
       console.error('Error al obtener actividades:', err);
-      return res.status(500).json({ error: 'Error al obtener actividades' });
+      return res.status(500).json({ error: 'Error al obtener actividades inscritas' });
     }
     res.json(results);
   });
 });
+
 // Eliminar usuario de actividad
 app.delete('/eliminar_usuario_actividad', (req, res) => {
   const { Id_User, Id_Actividad } = req.query;
