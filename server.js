@@ -8,8 +8,10 @@ const port = 3000;
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 app.use(cors({
-  origin: '*', // Permite cualquier origen
-  methods: ['GET', 'POST', 'OPTIONS'], // Define métodos permitidos
+  origin: 'http://localhost:8100', // Específico para el frontend
+  methods: ['GET', 'POST', 'OPTIONS'], // Métodos permitidos
+  allowedHeaders: ['Content-Type', 'Authorization'], // Headers permitidos
+  credentials: true, // Permitir cookies o encabezados con credenciales
 }));
 app.use(express.json());
 
