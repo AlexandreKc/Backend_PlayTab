@@ -240,7 +240,7 @@ app.post('/login', (req, res) => {
 
   const query = `
   SELECT 
-    Id_User, Nom_User, Correo_User, Celular_User, 
+    Id_User, Tipo_User, Nom_User, Correo_User, Celular_User, 
     Contra_User, COMUNA.Id_Comuna, COMUNA.Nombre_Comuna, 
     REGION.Id_Region, REGION.Nombre_Region 
   FROM USUARIO 
