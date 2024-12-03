@@ -7,7 +7,7 @@ const app = express();
 const port = 3000;
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
-const allowedOrigins = ['http://localhost:8100', 'http://backendplaytab-production.up.railway.app', 'capacitor://localhost', 'ionic://localhost' ];
+const allowedOrigins = ['http://localhost:8100', 'http://backendplaytab-production.up.railway.app'];
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
