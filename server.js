@@ -7,18 +7,19 @@ const app = express();
 const port = 3000;
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
-const allowedOrigins = ['https://localhost', 'http://backendplaytab-production.up.railway.app'];
+const allowedOrigins = ['http://localhost:8100', 'http://backendplaytab-production.up.railway.app','https://localhost'];
+
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
+      callback(null, true); // Permitir el origen
     } else {
-      callback(new Error('CORS no permitido'));
+      callback(new Error('CORS no permitido')); // Bloquear origen no autorizado
     }
   },
-  methods: ['GET', 'POST', 'OPTIONS','PUT','DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Métodos permitidos
+  allowedHeaders: ['Content-Type', 'Authorization'], // Encabezados permitidos
+  credentials: true, // Permitir cookies y autenticación
 }));
 app.options('*', cors()); // Maneja solicitudes preflight para cualquier ruta
 app.use(express.json());
@@ -37,7 +38,7 @@ db.connect((err) => {
   if (err) {
     console.error('Error connecting to the database:', err);
     return;  }
-  console.log('Connected to MySQL database');
+  console.log('Connected to database');
 });
 
 // Comprobación y adición de la columna 'token' para recuperación de contraseña *******************
@@ -75,7 +76,7 @@ app.post('/recover-password', (req, res) => {
         auth: { user: 'playtab.app2024@gmail.com', pass: 'bgzp cihw gjca qoml' }
       });
 
-      const resetUrl = `http://localhost:8100/reset-password/${token}`;
+      const resetUrl = `https://backendplaytab-production.up.railway.app/reset-password/${token}`;
       const mailOptions = {
         from: 'playtab.app2024@gmail.com',
         to: correo,
@@ -425,7 +426,7 @@ app.get('/historial', (req, res) => {
 // Obtener actividades y datos especificos de la actividad de los usuarios inscritos
 app.get('/actividad_activa', (req, res) => {
   const { Id_User } = req.query;
-  const query = `SELECT DISTINCT a.Nom_Actividad, a.Id_Actividad, u.Nom_User, a.Desc_Actividad, a.Direccion_Actividad, m.Cantidad_MaxJugador, a.Fecha_TER_Actividad, p.Tipo_Participante, s.Nom_SubCategoria, i.Url
+  const query = `SELECT DISTINCT a.Nom_Actividad, a.Id_Actividad, u.Nom_User, a.Desc_Actividad, u.Celular_UseR, a.Direccion_Actividad, m.Cantidad_MaxJugador, a.Fecha_TER_Actividad, p.Tipo_Participante, s.Nom_SubCategoria, i.Url
                   FROM PARTICIPANTE p
                   JOIN ACTIVIDAD a ON p.Id_Actividad = a.Id_Actividad
                   INNER JOIN MAXJUGADOR m ON a.Id_Maxjugador = m.Id_Maxjugador
@@ -446,7 +447,7 @@ app.get('/actividad_activa', (req, res) => {
 app.delete('/eliminar_usuario_actividad', (req, res) => {
   const { Id_User, Id_Actividad } = req.query;
 
-  const query = 'DELETE FROM participante WHERE Id_user = ? AND Id_actividad = ?';
+  const query = 'DELETE FROM PARTICIPANTE WHERE Id_user = ? AND Id_actividad = ?';
   db.query(query, [Id_User, Id_Actividad], (err, results) => {
     if (err) {
       console.error('Error al eliminar usuario de actividad:', err);
@@ -459,5 +460,5 @@ app.delete('/eliminar_usuario_actividad', (req, res) => {
 
 // Iniciar el servidor
 app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+  console.log(`Server running on https://backendplaytab-production.up.railway.app`);
 });
