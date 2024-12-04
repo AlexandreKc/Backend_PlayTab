@@ -460,7 +460,7 @@ app.delete('/eliminar_usuario_actividad', (req, res) => {
 app.get('/actividadesAnfitrion', (req, res) => {
   const { Id_User } = req.query; // Usamos Id_User desde la query en lugar de Id_Anfitrion_Actividad
   const query = `
-    SELECT a.Id_Actividad, a.Nom_Actividad, a.Desc_actividad, a.Direccion_Actividad, m.Cantidad_MaxJugador, u.Nom_User, a.Fecha_INI_Actividad, a.Fecha_TER_Actividad, i.Url, s.Id_SubCategoria, s.Nom_SubCategoria
+    SELECT a.Id_Actividad, a.Nom_Actividad, a.Desc_actividad, a.Direccion_Actividad, m.Cantidad_MaxJugador, u.Nom_User, a.Fecha_INI_Actividad, a.Fecha_TER_Actividad, i.Url, s.Id_SubCategoria, s.Id_Categoria, s.Nom_SubCategoria
     FROM ACTIVIDAD a
     INNER JOIN USUARIO u ON a.Id_Anfitrion_Actividad=u.Id_User
     JOIN IMAGEN i on a.Id_SubCategoria=i.Id_SubCategoria
