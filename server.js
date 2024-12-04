@@ -426,7 +426,7 @@ app.get('/historial', (req, res) => {
 // Obtener actividades y datos especificos de la actividad de los usuarios inscritos
 app.get('/actividad_activa', (req, res) => {
   const { Id_User } = req.query;
-  const query = `SELECT DISTINCT a.Nom_Actividad, a.Id_Actividad, u.Nom_User, a.Desc_Actividad, u.Celular_UseR, a.Direccion_Actividad, m.Cantidad_MaxJugador, a.Fecha_TER_Actividad, p.Tipo_Participante, s.Nom_SubCategoria, i.Url
+  const query = `SELECT DISTINCT a.Nom_Actividad, a.Id_Actividad, u.Nom_User, a.Desc_Actividad, u.Celular_User, a.Direccion_Actividad, m.Cantidad_MaxJugador, a.Fecha_TER_Actividad, p.Tipo_Participante, s.Nom_SubCategoria, i.Url
                   FROM PARTICIPANTE p
                   JOIN ACTIVIDAD a ON p.Id_Actividad = a.Id_Actividad
                   INNER JOIN MAXJUGADOR m ON a.Id_Maxjugador = m.Id_Maxjugador
