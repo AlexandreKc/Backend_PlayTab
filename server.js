@@ -24,6 +24,11 @@ app.use(cors({
 app.options('*', cors()); // Maneja solicitudes preflight para cualquier ruta
 app.use(express.json());
 
+app.use((req, res, next) => {
+  console.log(`Solicitud desde: ${req.headers.origin}`);
+  next();
+});
+
 
 // Configuración de la base de datos
 const db = mysql.createConnection({
