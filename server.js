@@ -457,6 +457,110 @@ app.delete('/eliminar_usuario_actividad', (req, res) => {
   });
 });
 
+app.get('/actividadesAnfitrion', (req, res) => {
+  const { Id_User } = req.query; // Usamos Id_User desde la query en lugar de Id_Anfitrion_Actividad
+  const query = `
+    SELECT a.Id_Actividad, a.Nom_Actividad, a.Desc_actividad, a.Direccion_Actividad, m.Cantidad_MaxJugador, u.Nom_User, a.Fecha_INI_Actividad, a.Fecha_TER_Actividad, i.Url, s.Id_SubCategoria, s.Nom_SubCategoria
+    FROM ACTIVIDAD a
+    INNER JOIN USUARIO u ON a.Id_Anfitrion_Actividad=u.Id_User
+    JOIN IMAGEN i on a.Id_SubCategoria=i.Id_SubCategoria
+    JOIN SUBCATEGORIA s ON a.Id_SubCategoria= s.Id_SubCategoria
+    JOIN CATEGORIA c on s.Id_Categoria=c.Id_Categoria
+    JOIN MAXJUGADOR m on a.Id_MaxJugador=m.Id_MaxJugador
+    WHERE Id_Anfitrion_Actividad=? and DATE(a.Fecha_INI_Actividad) = CURDATE()
+    order by a.Fecha_TER_Actividad asc;
+  `;
+  db.query(query, [Id_User], (err, results) => {
+    if (err) {
+      console.error('Error al obtener actividades de anfitrión:', err);
+      return res.status(500).json({ error: 'Error al obtener actividades del anfitrión' });
+    }
+    res.json(results);
+  });
+});
+
+// Actualizar actividad
+app.put('/updateActividad/:id', (req, res) => {
+  const Id_Actividad = req.params.id;
+  const { Desc_Actividad, Direccion_Actividad, Id_MaxJugador } = req.body;
+
+  console.log('Datos recibidos:', { Desc_Actividad, Direccion_Actividad, Id_MaxJugador });
+
+  const query = `
+    UPDATE ACTIVIDAD 
+    SET Desc_Actividad = ?, Direccion_Actividad = ?, Id_MaxJugador = ?
+    WHERE Id_Actividad = ?
+  `;
+
+  db.query(query, [Desc_Actividad, Direccion_Actividad, Id_MaxJugador, Id_Actividad], (err, result) => {
+    if (err) {
+      console.error('Error al actualizar actividad:', err);
+      return res.status(500).json({ error: 'Error al actualizar la actividad' });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Actividad no encontrada' });
+    }
+    res.status(200).json({ message: 'Actividad actualizada exitosamente' });
+  });
+});
+
+// Eliminar la actividad.
+app.delete('/actividad/:id', (req, res) => {
+  const Id_Actividad = req.params.id;
+  const query = 'DELETE FROM ACTIVIDAD WHERE Id_Actividad = ?';
+
+  db.query(query, [Id_Actividad], (err, result) => {
+    if (err) {
+      console.error('Error al eliminar actividad:', err);
+      return res.status(500).json({ error: 'Error al eliminar la actividad' });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'La actividad no existe' });
+    }
+    res.status(200).json({ message: 'Actividad eliminada exitosamente' });
+  });
+});
+
+app.get('/usuarios-inscritos/:idActividad', (req, res) => {
+  const { idActividad } = req.params;
+  const query = `
+    SELECT DISTINCT u.Id_User, u.Nom_User, u.Celular_User, a.Tipo_Asistencia 
+    FROM PARTICIPANTE p
+    INNER JOIN USUARIO u ON p.Id_User = u.Id_User
+    LEFT JOIN ASISTENCIA a ON p.Id_Asistencia = a.Id_Asistencia
+    WHERE p.Tipo_Participante = 200 AND p.Id_Actividad = ?
+  `;
+
+  db.query(query, [idActividad], (err, results) => {
+    if (err) {
+      console.error('Error al obtener usuarios inscritos:', err);
+      return res.status(500).json({ error: 'Error al obtener usuarios inscritos' });
+    }
+    res.json(results);
+  });
+});
+
+// Actualizar asistencia de un usuario
+app.put('/actualizar-asistencia', (req, res) => {
+  const { Id_User, Id_Actividad, Id_Asistencia } = req.body;
+
+  const query = `
+    UPDATE PARTICIPANTE 
+    SET Id_Asistencia = ? 
+    WHERE Id_User = ? AND Id_Actividad = ?
+  `;
+
+  db.query(query, [Id_Asistencia, Id_User, Id_Actividad], (err, result) => {
+    if (err) {
+      console.error('Error al actualizar asistencia:', err);
+      return res.status(500).json({ error: 'Error al actualizar la asistencia' });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'No se encontró la participación para actualizar.' });
+    }
+    res.status(200).json({ message: 'Asistencia actualizada exitosamente.' });
+  });
+});
 
 // Iniciar el servidor
 app.listen(port, () => {
