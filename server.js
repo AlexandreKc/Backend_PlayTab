@@ -11,6 +11,7 @@ const allowedOrigins = ['http://localhost:8100', 'http://backendplaytab-producti
 
 app.use(cors({
   origin: (origin, callback) => {
+    console.log('Request origin:', origin);
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true); // Permitir el origen
     } else {
@@ -24,10 +25,6 @@ app.use(cors({
 app.options('*', cors()); // Maneja solicitudes preflight para cualquier ruta
 app.use(express.json());
 
-app.use((req, res, next) => {
-  console.log(`Solicitud desde: ${req.headers.origin}`);
-  next();
-});
 
 
 // Configuración de la base de datos
@@ -81,7 +78,7 @@ app.post('/recover-password', (req, res) => {
         auth: { user: 'playtab.app2024@gmail.com', pass: 'bgzp cihw gjca qoml' }
       });
 
-      const resetUrl = `https://backendplaytab-production.up.railway.app/reset-password/${token}`;
+      const resetUrl = `http://backendplaytab-production.up.railway.app/reset-password/${token}`;
       const mailOptions = {
         from: 'playtab.app2024@gmail.com',
         to: correo,
