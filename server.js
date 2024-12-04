@@ -17,7 +17,7 @@ app.use(cors({
       callback(new Error('CORS no permitido')); // Bloquear origen no autorizado
     }
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Métodos permitidos
+  methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'], // Métodos permitidos
   allowedHeaders: ['Content-Type', 'Authorization'], // Encabezados permitidos
   credentials: true, // Permitir cookies y autenticación
 }));
