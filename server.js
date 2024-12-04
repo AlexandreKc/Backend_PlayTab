@@ -7,7 +7,7 @@ const app = express();
 const port = 3000;
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
-const allowedOrigins = ['http://localhost:8100', 'http://backendplaytab-production.up.railway.app','https://localhost'];
+const allowedOrigins = ['http://localhost:8100', 'http://backendplaytab-production.up.railway.app','https://localhost','http://localhost:8101'];
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -24,8 +24,6 @@ app.use(cors({
 }));
 app.options('*', cors()); // Maneja solicitudes preflight para cualquier ruta
 app.use(express.json());
-
-
 
 // Configuración de la base de datos
 const db = mysql.createConnection({
