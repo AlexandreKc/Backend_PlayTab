@@ -468,16 +468,24 @@ app.delete('/eliminar_usuario_actividad', (req, res) => {
 app.get('/actividadesAnfitrion', (req, res) => {
   const { Id_User } = req.query; // Usamos Id_User desde la query en lugar de Id_Anfitrion_Actividad
   const query = `
-    SELECT a.Id_Actividad, a.Nom_Actividad, a.Desc_actividad, a.Direccion_Actividad, m.Cantidad_MaxJugador, u.Nom_User, a.Fecha_INI_Actividad, a.Fecha_TER_Actividad, i.Url, s.Id_SubCategoria, s.Id_Categoria, s.Nom_SubCategoria
-    FROM ACTIVIDAD a
-    INNER JOIN USUARIO u ON a.Id_Anfitrion_Actividad=u.Id_User
-    JOIN IMAGEN i on a.Id_SubCategoria=i.Id_SubCategoria
-    JOIN SUBCATEGORIA s ON a.Id_SubCategoria= s.Id_SubCategoria
-    JOIN CATEGORIA c on s.Id_Categoria=c.Id_Categoria
-    JOIN MAXJUGADOR m on a.Id_MaxJugador=m.Id_MaxJugador
-    WHERE Id_Anfitrion_Actividad=? and DATE(a.Fecha_INI_Actividad) = CURDATE()
-    order by a.Fecha_TER_Actividad asc;
-  `;
+      SELECT a.Id_Actividad, a.Nom_Actividad, 
+      a.Desc_actividad, a.Direccion_Actividad, 
+      m.Cantidad_MaxJugador, 
+      u.Nom_User, 
+      a.Fecha_INI_Actividad, DATE_FORMAT(a.Fecha_INI_Actividad, '%d/%m/%Y') AS Fecha_Inicio, DATE_FORMAT(a.Fecha_INI_Actividad, '%H:%i') AS Hora_Inicio,
+      a.Fecha_TER_Actividad, DATE_FORMAT(a.Fecha_TER_Actividad, '%d/%m/%Y') AS Fecha_Termino, DATE_FORMAT(a.Fecha_TER_Actividad, '%H:%i') AS Hora_Termino,
+      i.Url, s.Id_SubCategoria, 
+      s.Id_Categoria, 
+      s.Nom_SubCategoria
+      FROM ACTIVIDAD a
+      INNER JOIN USUARIO u ON a.Id_Anfitrion_Actividad=u.Id_User
+      JOIN IMAGEN i on a.Id_SubCategoria=i.Id_SubCategoria
+      JOIN SUBCATEGORIA s ON a.Id_SubCategoria= s.Id_SubCategoria
+      JOIN CATEGORIA c on s.Id_Categoria=c.Id_Categoria
+      JOIN MAXJUGADOR m on a.Id_MaxJugador=m.Id_MaxJugador
+      WHERE Id_Anfitrion_Actividad=? and DATE(a.Fecha_INI_Actividad) = CURDATE()
+      order by a.Fecha_TER_Actividad asc;
+    `;
   db.query(query, [Id_User], (err, results) => {
     if (err) {
       console.error('Error al obtener actividades de anfitrión:', err);
