@@ -421,7 +421,8 @@ app.get('/historial', (req, res) => {
                   JOIN USUARIO u ON a.Id_Anfitrion_Actividad = u.Id_User
                   LEFT JOIN SUBCATEGORIA s ON s.Id_SubCategoria = a.Id_SubCategoria
                   LEFT JOIN IMAGEN i ON a.Id_SubCategoria = i.Id_SubCategoria
-                  WHERE p.Id_User = ?;`
+                  WHERE p.Id_User = ?
+                  order by a.Fecha_TER_Actividad desc;`
   db.query(query, [Id_User], (err, results) => {
     if (err) {
       console.error('Error al obtener el historial:', err);
