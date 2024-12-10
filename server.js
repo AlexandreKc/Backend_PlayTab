@@ -76,7 +76,7 @@ app.post('/recover-password', (req, res) => {
         auth: { user: 'playtab.app2024@gmail.com', pass: 'bgzp cihw gjca qoml' }
       });
 
-      const resetUrl = `http://backendplaytab-production.up.railway.app/reset-password/${token}`;
+      const resetUrl = `https://backendplaytab-production.up.railway.app/reset-password/${token}`;
       const mailOptions = {
         from: 'playtab.app2024@gmail.com',
         to: correo,
