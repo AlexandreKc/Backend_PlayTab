@@ -73,17 +73,17 @@ app.post('/recover-password', (req, res) => {
 
       const transporter = nodemailer.createTransport({
         service: 'Gmail',
-        auth: { user: 'playtab.app2024@gmail.com', pass: 'bgzp cihw gjca qoml' }
+        auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
       });
 
-      const resetUrl = `http://localhost:8100/reset-password/${token}`;
+      const resetUrl = `${token}`;
+
       const mailOptions = {
         from: 'playtab.app2024@gmail.com',
         to: correo,
         subject: 'Recuperación de contraseña',
-        text: `Haz clic en el siguiente enlace para restablecer tu contraseña: ${resetUrl}`,
-        html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p><a href="${resetUrl}">${resetUrl}</a>`
-      };
+        html: `Copia el siguiente token para restablecer tu contraseña: <b>${resetUrl}</b>`
+    };    
 
       transporter.sendMail(mailOptions, (error) => {
         if (error) return res.status(500).json({ error: 'Error enviando el correo' });
@@ -102,26 +102,20 @@ app.post('/reset-password', async (req, res) => {
 
   const query = 'SELECT * FROM USUARIO WHERE token = ?';
   db.query(query, [token], async (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: 'Error en el servidor' });
-    }
-    if (results.length === 0) {
-      return res.status(404).json({ error: 'Token inválido o expirado' });
-    }
+    if (err) return res.status(500).json({ error: 'Error en el servidor' });
+    if (results.length === 0) return res.status(404).json({ error: 'Token inválido o expirado' });
 
     try {
       const hashedPassword = await bcrypt.hash(newPassword, 10);
 
       const updatePasswordQuery = 'UPDATE USUARIO SET Contra_User = ?, token = NULL WHERE token = ?';
       db.query(updatePasswordQuery, [hashedPassword, token], (updateErr) => {
-        if (updateErr) {
-          return res.status(500).json({ error: 'Error al actualizar la contraseña' });
-        }
+        if (updateErr) return res.status(500).json({ error: 'Error al actualizar la contraseña' });
         res.status(200).json({ message: 'Contraseña actualizada exitosamente' });
       });
-    } catch (encryptionErr) {
-      console.error('Error al encriptar la contraseña:', encryptionErr);
-      res.status(500).json({ error: 'Error al procesar la nueva contraseña' });
+    } catch (hashErr) {
+      console.error('Error al encriptar la contraseña:', hashErr);
+      res.status(500).json({ error: 'Error interno del servidor' });
     }
   });
 });
