@@ -597,7 +597,7 @@ app.post('/cambiarFavorito', (req, res) => {
     Id_SubCategoria = VALUES(Id_SubCategoria);
   `;
 
-  db.query(query, [Id_SubCategoria, Id_User], (err, result) => {
+  db.query(query, [Id_User, Id_SubCategoria], (err, result) => {
     if (err) {
       console.error('Error al insertar o actualizar tu Actividad Favorita:', err);
       return res.status(500).json({ error: 'Error al insertar o actualizar tu Actividad Favorita.' });
