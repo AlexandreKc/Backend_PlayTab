@@ -235,12 +235,14 @@ app.post('/login', (req, res) => {
 
   const query = `
   SELECT 
-    Id_User, Tipo_User, Nom_User, Correo_User, Celular_User, 
-    Contra_User, COMUNA.Id_Comuna, COMUNA.Nombre_Comuna, 
-    REGION.Id_Region, REGION.Nombre_Region 
+    USUARIO.Id_User, USUARIO.Tipo_User, USUARIO.Nom_User, USUARIO.Correo_User, USUARIO.Celular_User, 
+    USUARIO.Contra_User, COMUNA.Id_Comuna, COMUNA.Nombre_Comuna, 
+    REGION.Id_Region, REGION.Nombre_Region, SUBCATEGORIA.Id_SubCategoria ,SUBCATEGORIA.Nom_SubCategoria
   FROM USUARIO 
   INNER JOIN COMUNA ON USUARIO.Id_Comuna = COMUNA.Id_Comuna 
-  INNER JOIN REGION ON COMUNA.Id_Region = REGION.Id_Region 
+  INNER JOIN REGION ON COMUNA.Id_Region = REGION.Id_Region
+  LEFT JOIN FAVORITO ON USUARIO.Id_User=FAVORITO.Id_User
+  LEFT JOIN SUBCATEGORIA ON FAVORITO.Id_SubCategoria=SUBCATEGORIA.Id_SubCategoria
   WHERE Correo_User = ?`;
 
   db.query(query, [Correo_User], async (err, result) => {
@@ -261,9 +263,8 @@ app.post('/login', (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
-
-    // Si la contraseña es válida, elimina la contraseña del objeto y responde
-    delete user.Contra_User; // Elimina la contraseña encriptada antes de enviar la respuesta
+    
+    delete user.Contra_User;
 
     res.status(200).json({ message: 'Login exitoso', user });
   });
