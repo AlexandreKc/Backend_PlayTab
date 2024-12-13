@@ -606,6 +606,33 @@ app.post('/cambiarFavorito', (req, res) => {
   });
 });
 
+app.get('/actividadFavorito', (req, res) => {
+  const { Id_Comuna } = req.query;
+  const { Id_SubCategoria } = req.query;
+  const query = `SELECT a.Id_Actividad, u.Nom_User, 
+                  a.Nom_Actividad, 
+                  a.Fecha_INI_Actividad, DATE_FORMAT(a.Fecha_INI_Actividad, '%d/%m/%Y') AS Fecha_Inicio, DATE_FORMAT(a.Fecha_INI_Actividad, '%H:%i') AS Hora_Inicio,
+                  a.Fecha_TER_Actividad, DATE_FORMAT(a.Fecha_TER_Actividad, '%d/%m/%Y') AS Fecha_Termino, DATE_FORMAT(a.Fecha_TER_Actividad, '%H:%i') AS Hora_Termino,
+                  a.Desc_Actividad, 
+                  a.Direccion_Actividad, 
+                  m.Cantidad_MaxJugador, 
+                  s.Nom_SubCategoria, 
+                  C.Nom_Categoria, i.Url 
+                          FROM ACTIVIDAD a Inner Join USUARIO u on a.Id_Anfitrion_Actividad = u.Id_User 
+                          INNER JOIN MAXJUGADOR m ON a.Id_Maxjugador = m.Id_Maxjugador 
+                          INNER JOIN SUBCATEGORIA s ON s.Id_SubCategoria = a.Id_SubCategoria 
+                          INNER JOIN CATEGORIA C ON s.Id_Categoria = C.Id_Categoria 
+                          LEFT JOIN IMAGEN i ON s.Id_SubCategoria = i.Id_SubCategoria
+                          WHERE a.Id_Comuna =? AND s.Id_SubCategoria=? AND Fecha_INI_Actividad<=now() and Fecha_TER_Actividad>=now();`;
+  db.query(query, [Id_Comuna, Id_SubCategoria], (err, results) => {
+    if (err) {
+      console.error('Error al obtener actividades favoritas:', err);
+      return res.status(500).json({ error: 'Error al obtener actividades favoritas' });
+    }
+    res.json(results);
+  });
+});
+
 // Iniciar el servidor
 app.listen(port, () => {
   console.log(`Server running on https://backendplaytab-production.up.railway.app`);
