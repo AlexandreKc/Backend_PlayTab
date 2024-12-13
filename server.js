@@ -583,6 +583,29 @@ app.put('/actualizar-asistencia', (req, res) => {
   });
 });
 
+app.post('/cambiarFavorito', (req, res) => {
+  const { Id_SubCategoria, Id_User } = req.body;
+
+  if (!Id_SubCategoria || !Id_User) {
+    return res.status(400).json({ error: 'Faltan datos requeridos' });
+  }
+
+  const query = `
+    INSERT INTO FAVORITO (Id_User, Id_SubCategoria) 
+    VALUES (?, ?) 
+    ON DUPLICATE KEY UPDATE 
+    Id_SubCategoria = VALUES(Id_SubCategoria);
+  `;
+
+  db.query(query, [Id_SubCategoria, Id_User], (err, result) => {
+    if (err) {
+      console.error('Error al insertar o actualizar tu Actividad Favorita:', err);
+      return res.status(500).json({ error: 'Error al insertar o actualizar tu Actividad Favorita.' });
+    }
+    res.status(201).json({ message: 'Actividad Favorita insertada o actualizada.' });
+  });
+});
+
 // Iniciar el servidor
 app.listen(port, () => {
   console.log(`Server running on https://backendplaytab-production.up.railway.app`);
