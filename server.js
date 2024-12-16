@@ -374,22 +374,6 @@ app.post('/participante', (req, res) => {
   });
 });
 
-//Eliminar Usuario
-app.delete('/borrarUser/:Id_User', (req, res) => {
-  const Id_User = req.params.Id_User;
-  const deleteQuery = 'DELETE FROM USUARIO WHERE Id_User = ?';
-
-  db.query(deleteQuery, [Id_User], (err, result) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).send('Error al eliminar el usuario >:(');
-    } else if (result.affectedRows === 0) {
-      return res.status(404).send('Usuario no encontrado :(');
-    } else {
-      res.status(200).json({ message: 'Usuario eliminado con éxito :D' });
-    }
-  });
-});
 
 // Cambiar la comuna
 app.put('/cambiaComuna', (req, res) => {
@@ -645,13 +629,17 @@ app.get('/actividadFavorito', (req, res) => {
 app.get('/usuarios', (req, res) => {
   const query = `
     SELECT 
-      Id_User, 
-      Run_User, 
-      Tipo_User, 
-      Nom_User, 
-      Correo_User, 
-      Id_Clasificacion 
-    FROM USUARIO;
+      u.Id_User, 
+      u.Run_User, 
+      u.Tipo_User, 
+      u.Nom_User, 
+      u.Correo_User, 
+      u.Celular_User,
+      u.FechaNac_User,
+      u.Id_Clasificacion 
+    FROM USUARIO u
+    Inner Join COMUNA c ON u.Id_Comuna = c.Id_Comuna
+    Inner Join REGION r ON u.Id_Region = r.Id_Region;
   `;
 
   db.query(query, (err, results) => {
@@ -663,6 +651,23 @@ app.get('/usuarios', (req, res) => {
     res.status(200).json(results);
   });
 });
+//Eliminar Usuario
+app.delete('/borrarUser/:Id_User', (req, res) => {
+  const Id_User = req.params.Id_User;
+  const deleteQuery = 'DELETE FROM USUARIO WHERE Id_User = ?';
+
+  db.query(deleteQuery, [Id_User], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Error al eliminar el usuario >:(');
+    } else if (result.affectedRows === 0) {
+      return res.status(404).send('Usuario no encontrado :(');
+    } else {
+      res.status(200).json({ message: 'Usuario eliminado con éxito :D' });
+    }
+  });
+});
+
 
 // Iniciar el servidor
 app.listen(port, () => {
