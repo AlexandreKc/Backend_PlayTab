@@ -26,20 +26,52 @@ app.options('*', cors()); // Maneja solicitudes preflight para cualquier ruta
 app.use(express.json());
 
 // Configuración de la base de datos
-const db = mysql.createConnection({
-  host: process.env.EV_HOST,
-  user: process.env.EV_USERNAME,
-  password: process.env.EV_PASS, 
-  database: process.env.EV_NAME
-});
+let db;
 
-// Conexión a la base de datos MySQL
-db.connect((err) => {
-  if (err) {
-    console.error('Error connecting to the database:', err);
-    return;  }
-  console.log('Connected to database');
-});
+function handleDisconnect() {
+  db = mysql.createConnection({
+    host: process.env.EV_HOST,
+    user: process.env.EV_USERNAME,
+    password: process.env.EV_PASS, 
+    database: process.env.EV_NAME
+  });
+
+  // Conectar a la base de datos
+  db.connect((err) => {
+    if (err) {
+      console.error('Error al conectar a la base de datos:', err);
+      setTimeout(handleDisconnect, 2000); // Intentar reconectar después de 2 segundos
+    } else {
+      console.log('Conexión a la base de datos restablecida.');
+    }
+  });
+
+  // Manejar errores de conexión
+  db.on('error', (err) => {
+    console.error('Error de conexión a la base de datos:', err);
+    if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+      console.log('Intentando restablecer la conexión...');
+      handleDisconnect(); // Reconectar automáticamente
+    } else {
+      throw err; // Lanza otros errores
+    }
+  });
+}
+
+// Inicializar la conexión
+handleDisconnect();
+
+// Mantener la conexión activa
+setInterval(() => {
+  db.ping((err) => {
+    if (err) {
+      console.error('Error al hacer ping a la base de datos:', err);
+    } else {
+      console.log('Ping exitoso a la base de datos.');
+    }
+  });
+}, 60000); // Ping cada 60 segundos
+
 
 // Rutas y funciones para la recuperación de contraseña **************************************
 app.post('/recover-password', (req, res) => {
