@@ -641,6 +641,28 @@ app.get('/actividadFavorito', (req, res) => {
 });
 
 
+// Endpoint para obtener datos de la tabla USUARIO
+app.get('/usuarios', async (req, res) => {
+  try {
+    // Consulta SQL para obtener los campos requeridos
+    const query = `
+      SELECT 
+        Id_User, 
+        Run_User, 
+        Tipo_User, 
+        Nom_User, 
+        Correo_User, 
+        Id_Clasificacion 
+      FROM USUARIO;
+    `;
+    
+    const [rows] = await pool.query(query); // Ejecutar la consulta
+    res.status(200).json(rows); // Responder con los resultados en formato JSON
+  } catch (error) {
+    console.error('Error al obtener los datos de la tabla USUARIO:', error);
+    res.status(500).json({ error: 'Error al obtener los datos' });
+  }
+});
 // Iniciar el servidor
 app.listen(port, () => {
   console.log(`Server running on https://backendplaytab-production.up.railway.app`);
