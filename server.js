@@ -636,10 +636,12 @@ app.get('/usuarios', (req, res) => {
       u.Correo_User, 
       u.Celular_User,
       u.FechaNac_User,
-      u.Id_Clasificacion 
+      u.Id_Clasificacion,
+      c.Nombre_Comuna,
+      r.Nombre_Region,
     FROM USUARIO u
     Inner Join COMUNA c ON u.Id_Comuna = c.Id_Comuna
-    Inner Join REGION r ON u.Id_Region = r.Id_Region;
+    Inner Join REGION r ON r.Id_Region = r.Id_Region;
   `;
 
   db.query(query, (err, results) => {
@@ -649,6 +651,7 @@ app.get('/usuarios', (req, res) => {
     }
 
     res.status(200).json(results);
+    console.log("Usuarios cargados")
   });
 });
 //Eliminar Usuario
