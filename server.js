@@ -628,20 +628,20 @@ app.get('/actividadFavorito', (req, res) => {
 // Endpoint para obtener datos de la tabla USUARIO
 app.get('/usuarios', (req, res) => {
   const query = `
-    SELECT 
-      u.Id_User, 
-      u.Run_User, 
-      u.Tipo_User, 
-      u.Nom_User, 
-      u.Correo_User, 
-      u.Celular_User,
-      u.FechaNac_User,
-      u.Id_Clasificacion,
-      c.Nombre_Comuna,
-      r.Nombre_Region,
-    FROM USUARIO u
-    Inner Join COMUNA c ON u.Id_Comuna = c.Id_Comuna
-    Inner Join REGION r ON r.Id_Region = r.Id_Region;
+SELECT 
+  u.Id_User, 
+  u.Run_User, 
+  u.Tipo_User, 
+  u.Nom_User, 
+  u.Correo_User, 
+  u.Celular_User,
+  u.FechaNac_User,
+  u.Id_Clasificacion,
+  c.Nombre_Comuna,
+  r.Nombre_Region
+FROM USUARIO u
+INNER JOIN COMUNA c ON u.Id_Comuna = c.Id_Comuna
+INNER JOIN REGION r ON c.Id_Region = r.Id_Region;
   `;
 
   db.query(query, (err, results) => {
