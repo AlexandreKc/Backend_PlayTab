@@ -741,7 +741,18 @@ app.put('/update-usuario/:Id_User', (req, res) => {
     }
   );
 });
-
+// Obtener todas las comunas existentes
+app.get('/comunas', (req, res) => {
+  const query = 'SELECT * FROM COMUNA'; // Consulta para obtener todas las comunas
+  
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error al obtener las comunas:', err);
+      return res.status(500).json({ error: 'Error al obtener las comunas.' });
+    }
+    res.status(200).json(results); // Enviar el resultado como JSON
+  });
+});
 
 // Iniciar el servidor
 app.listen(port, () => {
