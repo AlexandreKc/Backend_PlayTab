@@ -669,6 +669,8 @@ app.get('/usuarios', (req, res) => {
       u.Celular_User,
       u.FechaNac_User,
       u.Id_Clasificacion,
+      c.Id_Comuna,
+      r.Id_Region,
       c.Nombre_Comuna,
       r.Nombre_Region
     FROM USUARIO u
@@ -699,6 +701,45 @@ app.delete('/borrarUser/:Id_User', (req, res) => {
       res.status(200).json({ message: 'Usuario eliminado con éxito :D' });
     }
   });
+});
+//Este endpoint será para los cambio de datos que tendrá el administrador
+app.put('/update-usuario/:Id_User', (req, res) => {
+  const { Id_User } = req.params;
+  const { Tipo_User, Nom_User, Correo_User, Celular_User, Id_Comuna } = req.body;
+
+  if (!Id_User || !Tipo_User || !Nom_User || !Correo_User || !Celular_User || !Id_Comuna) {
+    return res.status(400).json({ error: 'Faltan datos requeridos para la actualización.' });
+  }
+
+  const query = `
+    UPDATE USUARIO u
+    INNER JOIN COMUNA c ON u.Id_Comuna = c.Id_Comuna
+    INNER JOIN REGION r ON c.Id_Region = r.Id_Region
+    SET 
+      u.Tipo_User = ?, 
+      u.Nom_User = ?, 
+      u.Correo_User = ?, 
+      u.Celular_User = ?, 
+      u.Id_Comuna = ?
+    WHERE u.Id_User = ?;
+  `;
+
+  db.query(
+    query,
+    [Tipo_User, Nom_User, Correo_User, Celular_User, Id_Comuna, Id_User],
+    (err, result) => {
+      if (err) {
+        console.error('Error al actualizar el usuario:', err);
+        return res.status(500).json({ error: 'Error al actualizar el usuario.' });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ error: 'Usuario no encontrado.' });
+      }
+
+      res.status(200).json({ message: 'Usuario actualizado exitosamente.' });
+    }
+  );
 });
 
 
