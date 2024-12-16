@@ -628,32 +628,30 @@ app.get('/actividadFavorito', (req, res) => {
 // Endpoint para obtener datos de la tabla USUARIO
 app.get('/usuarios', (req, res) => {
   const query = `
-SELECT 
-  u.Id_User, 
-  u.Run_User, 
-  u.Tipo_User, 
-  u.Nom_User, 
-  u.Correo_User, 
-  u.Celular_User,
-  u.FechaNac_User,
-  u.Id_Clasificacion,
-  c.Nombre_Comuna,
-  r.Nombre_Region
-FROM USUARIO u
-INNER JOIN COMUNA c ON u.Id_Comuna = c.Id_Comuna
-INNER JOIN REGION r ON c.Id_Region = r.Id_Region;
+    SELECT 
+      u.Id_User, 
+      u.Run_User, 
+      u.Tipo_User, 
+      u.Nom_User, 
+      u.Correo_User, 
+      u.Celular_User,
+      u.FechaNac_User,
+      u.Id_Clasificacion,
+      c.Nombre_Comuna,
+      r.Nombre_Region
+    FROM USUARIO u
+    INNER JOIN COMUNA c ON u.Id_Comuna = c.Id_Comuna
+    INNER JOIN REGION r ON c.Id_Region = r.Id_Region;
   `;
-
   db.query(query, (err, results) => {
     if (err) {
       console.error('Error al obtener los datos de la tabla USUARIO:', err);
       return res.status(500).json({ error: 'Error al obtener los datos de la tabla USUARIO' });
     }
-
     res.status(200).json(results);
-    console.log("Usuarios cargados")
   });
 });
+
 //Eliminar Usuario
 app.delete('/borrarUser/:Id_User', (req, res) => {
   const Id_User = req.params.Id_User;
