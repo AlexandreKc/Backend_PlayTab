@@ -661,18 +661,28 @@ app.get('/actividadFavorito', (req, res) => {
 app.get('/usuarios', (req, res) => {
   const query = `
     SELECT 
-      u.Id_User, 
-      u.Run_User, 
-      u.Tipo_User, 
-      u.Nom_User, 
-      u.Correo_User, 
-      u.Celular_User,
-      u.FechaNac_User,
-      u.Id_Clasificacion,
-      c.Id_Comuna,
-      r.Id_Region,
-      c.Nombre_Comuna,
-      r.Nombre_Region
+    u.Id_User, 
+    u.Run_User, 
+    u.Tipo_User, 
+    u.Nom_User, 
+    u.Correo_User, 
+    u.Celular_User,
+    u.FechaNac_User,
+    c.Id_Comuna,
+    r.Id_Region,
+    c.Nombre_Comuna,
+    r.Nombre_Region,
+    (SELECT 
+            (SELECT COUNT(ID_ASISTENCIA)
+             FROM PARTICIPANTE p1
+             WHERE p1.ID_ASISTENCIA = 800 
+               AND p1.ID_USER = u.Id_User 
+               AND p1.TIPO_PARTICIPANTE = 200) /
+            (SELECT COUNT(ID_ACTIVIDAD)
+             FROM PARTICIPANTE p2
+             WHERE p2.ID_USER = u.Id_User 
+               AND p2.TIPO_PARTICIPANTE = 200)
+    ) AS Rating
     FROM USUARIO u
     INNER JOIN COMUNA c ON u.Id_Comuna = c.Id_Comuna
     INNER JOIN REGION r ON c.Id_Region = r.Id_Region;
